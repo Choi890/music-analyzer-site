@@ -105,6 +105,7 @@ function bindEvents() {
 }
 
 async function handleFile(file) {
+  // File handling owns browser-only concerns: object URLs, decode errors, and UI busy states.
   if (!file.type.startsWith("audio/") && !file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac)$/i)) {
     setStatus("오디오 파일만 가능");
     return;
@@ -139,6 +140,7 @@ async function handleFile(file) {
 }
 
 async function analyzeAudio(buffer, file) {
+  // Build one report object so all charts and recommendation text render from the same analysis pass.
   const mono = makeMono(buffer);
   await nextFrame();
 
@@ -288,6 +290,7 @@ function buildLoudness(mono, sampleRate, bins) {
 }
 
 function analyzeSpectrum(mono, sampleRate) {
+  // Spectral features are sampled across the track to balance speed with stable mix descriptors.
   const fftSize = 4096;
   const half = fftSize / 2;
   const frameCount = Math.min(72, Math.max(10, Math.floor(mono.length / fftSize)));
@@ -444,6 +447,7 @@ function buildSpectrogram(mono, sampleRate) {
 }
 
 function estimateTempo(mono, sampleRate) {
+  // Onset autocorrelation gives a lightweight BPM estimate without external libraries.
   const hop = 1024;
   const frameSize = 2048;
   const frameCount = Math.max(0, Math.floor((mono.length - frameSize) / hop));
@@ -1008,6 +1012,7 @@ function hexToRgb(hex) {
 }
 
 function fft(real, imag) {
+  // In-place radix-2 FFT used by every browser-side spectral visualization.
   const n = real.length;
   let j = 0;
   for (let i = 1; i < n; i += 1) {
