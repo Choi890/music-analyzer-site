@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sonic Lens | Music Analyzer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>Sonic Lens</h1>
+            <p>음악 파일 분석 대시보드</p>
+          </div>
+        </div>
+        <div class="status-pill" id="statusText">파일 대기 중</div>
+      </header>
+
+      <main>
+        <section class="workspace">
+          <div class="upload-surface" id="dropZone">
+            <input id="fileInput" type="file" accept="audio/*" />
+            <div class="upload-copy">
+              <span class="kicker">Upload</span>
+              <h2><span>오디오 파일을</span><span>올려주세요</span></h2>
+              <p>MP3, WAV, OGG, FLAC 등 브라우저가 재생할 수 있는 파일을 분석합니다.</p>
+            </div>
+            <button class="primary-action" id="selectButton" type="button">파일 선택</button>
+            <div class="privacy-note">분석은 현재 브라우저 안에서만 실행됩니다.</div>
+          </div>
+
+          <div class="hero-visual">
+            <canvas id="heroCanvas" width="1120" height="520" aria-label="실시간 음악 시각화"></canvas>
+            <div class="playback-bar">
+              <audio id="audioPlayer" controls></audio>
+            </div>
+          </div>
+        </section>
+
+        <section class="summary-grid" aria-label="핵심 분석 결과">
+          <article class="metric-block">
+            <span>길이</span>
+            <strong id="durationValue">--:--</strong>
+          </article>
+          <article class="metric-block">
+            <span>BPM</span>
+            <strong id="bpmValue">--</strong>
+          </article>
+          <article class="metric-block">
+            <span>키</span>
+            <strong id="keyValue">--</strong>
+          </article>
+          <article class="metric-block">
+            <span>평균 음량</span>
+            <strong id="rmsValue">-- dB</strong>
+          </article>
+          <article class="metric-block">
+            <span>피크</span>
+            <strong id="peakValue">-- dB</strong>
+          </article>
+          <article class="metric-block">
+            <span>밝기</span>
+            <strong id="brightnessValue">--</strong>
+          </article>
+        </section>
+
+        <section class="insight-band">
+          <div>
+            <span class="kicker">Profile</span>
+            <h2 id="profileTitle">분석 준비 완료</h2>
+          </div>
+          <p id="profileText">파일을 업로드하면 사운드 성향과 믹스 상태를 요약합니다.</p>
+          <div class="tag-row" id="tagRow"></div>
+        </section>
+
+        <section class="chart-grid">
+          <article class="panel wide">
+            <div class="panel-heading">
+              <h3>파형</h3>
+              <span id="waveformMeta">Peak / RMS</span>
+            </div>
+            <canvas id="waveformCanvas" width="1280" height="320"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>평균 스펙트럼</h3>
+              <span>20 Hz - 20 kHz</span>
+            </div>
+            <canvas id="spectrumCanvas" width="760" height="420"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>피치 클래스</h3>
+              <span id="keyConfidence">Key confidence</span>
+            </div>
+            <canvas id="chromaCanvas" width="760" height="420"></canvas>
+          </article>
+
+          <article class="panel wide">
+            <div class="panel-heading">
+              <h3>스펙트로그램</h3>
+              <span>시간별 주파수 에너지</span>
+            </div>
+            <canvas id="spectrogramCanvas" width="1280" height="420"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>라우드니스 타임라인</h3>
+              <span id="loudnessMeta">RMS dBFS</span>
+            </div>
+            <canvas id="loudnessCanvas" width="760" height="420"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>스테레오 이미지</h3>
+              <span id="stereoMeta">L/R correlation</span>
+            </div>
+            <canvas id="stereoCanvas" width="760" height="420"></canvas>
+          </article>
+        </section>
+
+        <section class="detail-layout">
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>파일 정보</h3>
+              <span id="fileNameValue">No file</span>
+            </div>
+            <dl class="detail-list" id="fileDetails"></dl>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>믹스 지표</h3>
+              <span>Technical</span>
+            </div>
+            <dl class="detail-list" id="mixDetails"></dl>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>주파수 밸런스</h3>
+              <span>Energy share</span>
+            </div>
+            <div class="band-list" id="bandList"></div>
+          </article>
+        </section>
+
+        <section class="actions-row">
+          <button class="secondary-action" id="exportButton" type="button" disabled>분석 리포트 저장</button>
+          <button class="secondary-action" id="clearButton" type="button" disabled>초기화</button>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
