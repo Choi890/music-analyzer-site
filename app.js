@@ -105,7 +105,8 @@ function bindEvents() {
 }
 
 async function handleFile(file) {
-  // File handling owns browser-only concerns: object URLs, decode errors, and UI busy states.
+  // 파일 선택 이후의 브라우저 전용 처리를 모두 담당한다.
+  // Object URL 생성, 오디오 디코딩, 분석 중 상태 표시, 실패 메시지를 이 함수에서 순서대로 처리한다.
   if (!file.type.startsWith("audio/") && !file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac)$/i)) {
     setStatus("오디오 파일만 가능");
     return;
@@ -140,7 +141,8 @@ async function handleFile(file) {
 }
 
 async function analyzeAudio(buffer, file) {
-  // Build one report object so all charts and recommendation text render from the same analysis pass.
+  // 디코딩된 AudioBuffer에서 한 번에 분석 리포트를 만든다.
+  // 파형, 라우드니스, 스펙트럼, BPM, 스테레오 분석 결과를 같은 데이터 묶음으로 반환해 화면 전체가 같은 기준을 쓰게 한다.
   const mono = makeMono(buffer);
   await nextFrame();
 
@@ -290,7 +292,8 @@ function buildLoudness(mono, sampleRate, bins) {
 }
 
 function analyzeSpectrum(mono, sampleRate) {
-  // Spectral features are sampled across the track to balance speed with stable mix descriptors.
+  // 곡 전체에서 여러 프레임을 샘플링해 평균 스펙트럼과 음색 지표를 계산한다.
+  // 한 순간만 보면 인트로나 무음 구간에 치우칠 수 있어서, 여러 지점을 섞어 안정적인 믹스 특징을 얻는다.
   const fftSize = 4096;
   const half = fftSize / 2;
   const frameCount = Math.min(72, Math.max(10, Math.floor(mono.length / fftSize)));
@@ -447,7 +450,8 @@ function buildSpectrogram(mono, sampleRate) {
 }
 
 function estimateTempo(mono, sampleRate) {
-  // Onset autocorrelation gives a lightweight BPM estimate without external libraries.
+  // 에너지 변화량을 onset으로 보고 자기상관을 돌려 BPM 후보를 찾는다.
+  // 외부 라이브러리 없이 빠르게 동작해야 하는 브라우저 앱이므로 정확도보다 반응성과 가벼움을 우선한다.
   const hop = 1024;
   const frameSize = 2048;
   const frameCount = Math.max(0, Math.floor((mono.length - frameSize) / hop));
@@ -1012,7 +1016,8 @@ function hexToRgb(hex) {
 }
 
 function fft(real, imag) {
-  // In-place radix-2 FFT used by every browser-side spectral visualization.
+  // 브라우저 안에서 직접 실행하는 radix-2 FFT 구현이다.
+  // 스펙트럼, 스펙트로그램, 키 추정처럼 주파수 영역이 필요한 모든 분석의 기반으로 쓰인다.
   const n = real.length;
   let j = 0;
   for (let i = 1; i < n; i += 1) {
